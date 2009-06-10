@@ -9,26 +9,26 @@ class PromoAdmin extends LeftAndMainJQuery13 {
 		parent::init();
 		
 		/* UI theme. Should this be in JQuery13? */
-		Requirements::css('promo/css/theme_ss/ui.tabs.css');
+		Requirements::css('promospots/css/theme_ss/ui.tabs.css');
 		$ui = array('core', 'theme', 'resizable', 'datepicker');
-		foreach ($ui as $css) Requirements::css("promo/css/cupertino/ui.$css.css");		
+		foreach ($ui as $css) Requirements::css("promospots/css/cupertino/ui.$css.css");		
 		
 		/* Require the UI code I need */
 		$ui = array('ui.core', 'ui.tabs', 'ui.draggable', 'ui.droppable', 'ui.sortable', 'ui.resizable', 'ui.datepicker', 'effects.core', 'effects.scale');
 		foreach ($ui as $lib) JQuery13::requireUI($lib);
 		
 		/* And a single extra library */
-		Requirements::javascript('promo/javascript/jquery.json.js');
+		Requirements::javascript('promospots/javascript/jquery.json.js');
 		
 		/* My (Hamish Friedlander's) code. This should be pulled into a different module or something once I'm done with it */
-		Requirements::javascript('promo/javascript/jquery.stringinterp.js');
-		Requirements::javascript('promo/javascript/jquery.dat.js');
-		Requirements::javascript('promo/javascript/jquery.specifity.js');
-		Requirements::javascript('promo/javascript/jquery.fastis.js');
-		Requirements::javascript('promo/javascript/jquery.concrete.js');
+		Requirements::javascript('promospots/javascript/jquery.stringinterp.js');
+		Requirements::javascript('promospots/javascript/jquery.dat.js');
+		Requirements::javascript('promospots/javascript/jquery.specifity.js');
+		Requirements::javascript('promospots/javascript/jquery.fastis.js');
+		Requirements::javascript('promospots/javascript/jquery.concrete.js');
 		
-		Requirements::css('promo/css/PromoAdmin.css');
-		Requirements::javascript('promo/javascript/PromoAdmin.js');
+		Requirements::css('promospots/css/PromoAdmin.css');
+		Requirements::javascript('promospots/javascript/PromoAdmin.js');
 		
 		Requirements::customScript($this->PromoSections());
 	}
