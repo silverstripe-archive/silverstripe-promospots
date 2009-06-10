@@ -1,0 +1,109 @@
+####################################################
+Promotion Spot Admin Module
+####################################################
+
+# WARNING WARNING WARNING
+# ENTERING ALPHA ZONE
+
+# Maintainer Contact
+Hamish Friedlander (Nickname: hfried)
+<hamish (at) silverstripe (dot) com>
+
+# Requirements
+SilverStripe minimum version 2.3.0
+
+# Documentation
+A module for adding promotion sections and spots to a page, and a GUI editor for same
+
+Imagine a magazine or news style website. Typically the homepage has a collection of
+links to internal content. These sections can display automatically selected items, but
+generally editors want the ability to override their contents when appropriate. They may
+also want to adjust the layout of these items.
+
+This module solves this problem. It uses the notion of Promo Sections, which are composed
+of one or more Promo Spots. Each Promo Spot can be assigned a variety of 'items' organized
+by date (the exact definition of item depends on the Promo Section). Each Promo Section has
+a fixed display format, but a there can be a variety of defined Promo Sections, and the
+Promo Sections for a given page can be edited 
+
+# Use (in progress..)
+
+There are three parts to using this module:
+
+## Decorator attachement to page type
+
+First, attach the HasPromosDecorator to a page type in mysite/_config.php. 
+
+e.g.
+
+Object::add_extension('HomePage', 'HasPromosDecorator');
+
+## Item Providers
+
+You'll need to define an item provider, which defines exactly what items can be attached to
+a given Promo Spot. This is a PHP class that implements the PromoItemsProvider interfaces
+
+e.g.
+
+class PromoPagesProvider extends Object implements PromoItemsProvider {
+	function ItemForID($id) {
+		return DataObject::get_by_id('Page', $id);
+	}
+	
+	function LabelForID($id) {
+		return $this->ItemForID($id)->Title;
+	}
+
+	function AvailableItems($Page) {
+		$data = new ArrayData(array('Pages' => DataObject::get('Page')));
+		return $data->renderWith('PromoSections/AvailableArticles');
+	}
+	
+	function AvailableItemFilterForm() {
+		$fields = new FieldSet(
+			new TextField('Keywords')
+		);
+		$actions = new FieldSet(
+			new FormAction('Filter', 'Filter')
+		);
+		
+		return new Form($this, 'AvailableItemsFilterForm', $fields, $actions); 
+	}
+}
+
+## Promo Sections
+
+Then create Promo Section definitions. A Promo Section definition consists of a PHP class
+(which inherits off PromoSectionTemplate) and two templates (one for live use, one as a preview).
+
+The PHP class provides configuration variables
+
+The preview template has some restrictions in order for the resizing in the admin interface to work
+
+ * All dimensions must be in em's.
+ * The total width of the template must be 50em
+ 
+# To do
+
+There is still a moderate amount of functional work to do on this module
+
+ * Allow multiple PromoSection containers per page (probably by removing HasPromoSection decorator, which isn't really the right way of doing things)
+ * Make PromoSection and PromoSpot versioned
+ * Provide pre-defined PromoItemProviders for common types
+ * Provide some pre-defined templates
+ * Allow definition of available PromoSections (for subsite use)
+ * Allow preview of content in admin page for various dates
+
+And some smaller tidying
+
+ * Much of the jquery stuff should go into a jsparty-like repository, not here
+ * Likewise with the jquery css stuff
+ * Resize detection is pretty poor, and auto-height restriction of page view needs work
+ * Cancel does nothing, and save provides no indication of pass / failure
+ * CSS needs tidying
+ * li#PromoSection containing div#promosection is ugly, needs fixing
+ * Data access needs moving to properties
+ * No tests
+ 
+
+

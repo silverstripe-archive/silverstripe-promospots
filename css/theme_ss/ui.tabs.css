@@ -1,0 +1,52 @@
+/*
+Tab styling for jquery ui tabs, copied from old SilverStripe prototype tabs
+*/
+
+ul.ui-tabs-nav {
+	border-bottom: 1px #AAA solid;
+	padding: 0;
+	margin: 0 !important;
+	clear: left;
+	float: left;
+	width: 100%;
+	/* Need this to stop tabs from disappearing sometimes */
+	position: relative;
+}
+	ul.ui-tabs-nav li {
+		float: left;
+		list-style: none;
+		background: url(images/norm_li_bg.gif) no-repeat left 3px;
+		margin: 0 2px 0 0;
+		padding: 0 0 0 9px;
+		cursor: pointer;
+		position: relative;
+		top: 1px;
+	}
+	ul.ui-tabs-nav li.ui-tabs-selected {
+		background: url(images/sel_li_bg.gif) no-repeat left top;
+		top: 1px;
+	}
+		ul.ui-tabs-nav li a {
+			background: url(images/norm_a_bg.gif) no-repeat right 3px;
+			display: block;
+			float: left;
+			outline: none;
+			padding: 7px 9px 3px 0;
+			text-decoration: none;
+			color: #555;
+			font-size: 11px;
+			font-weight: bold;
+		}
+		ul.ui-tabs-nav li.ui-tabs-selected a {
+			background: url(images/sel_a_bg.gif) no-repeat right top;
+			padding: 6px 9px 5px 0;
+			color: #0074c6;
+		}
+		ul.ui-tabs-nav li a:hover {
+			text-decoration: none;
+			color: #000;
+		}
+
+.ui-tabs .ui-tabs-hide {
+	display: none;
+}
