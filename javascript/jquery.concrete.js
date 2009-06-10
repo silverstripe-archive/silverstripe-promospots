@@ -33,13 +33,13 @@
 		generate: function(options){
 			options = options || {};
 			var getter, setter;
-			if (options.initial) {
-				var initial = options.initial;
+			if (options.initial !== undefined) {
 				getter = function(){ 
 					var d = this.d(); var k = arguments.callee.pname;
-					if (!d.hasOwnProperty(k)) d[k] = initial;
+					if (!d.hasOwnProperty(k)) d[k] = arguments.callee.initial;
 					return d[k];
 				};
+				getter.initial = options.initial;
 			}
 			else getter = function(){ return this.d()[arguments.callee.pname] }
 			
