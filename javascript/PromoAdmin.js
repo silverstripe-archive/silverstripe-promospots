@@ -158,7 +158,7 @@ var fixRightWidth = function() {
 	$('.PromoSchedule .PromoItem').concrete({
 		onmatch: function(){
 			this
-				.prepend('<img class="remove" src="promo/images/cross-small.png" />')
+				.prepend('<img class="remove" src="promospots/images/cross-small.png" />')
 				.draggable({
 					distance: 0,
 					start: function(ev, ui) {
@@ -457,7 +457,7 @@ var fixRightWidth = function() {
 	$('#PromoPageSections.editing .PromoSection').concrete({
 		onmatch: function(){
 			if ($(this).find('.remove').length == 0) {
-				$(this).find('.promosection').prepend('<img class="remove" src="promo/images/cross-circle.png" />');
+				$(this).find('.promosection').prepend('<img class="remove" src="promospots/images/cross-circle.png" />');
 				$(this).find('.remove').bind('click', function(){ 
 					var list = $(this).parents('#PromoPageSections');
 					$(this).parent().remove(); 
