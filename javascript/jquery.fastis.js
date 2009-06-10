@@ -135,7 +135,7 @@ Sizzle is good for finding elements for a selector, but not so good for telling 
 		var m;
 		if (!cache[selector]) {
 			if (selector.match(/:[^n]|\[/)) return this.is(selector);
-			cache[selector] = new Function('el', compile_fast_is(selector));
+			cache[selector] = new Function('el', 'if (!el) return false;'+compile_fast_is(selector));
 		}
 		return cache[selector](this[0]);
 	}

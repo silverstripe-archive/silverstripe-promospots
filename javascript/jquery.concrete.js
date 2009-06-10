@@ -1,7 +1,7 @@
-var prxy_counts = [0,0,0];
 (function($) {	
 	/* Store holds the non-namespaced functions. This object is keyed by function name, and each value is an array of [selector, function, specifity] arrays */
 	var store = {};
+	var onmatches = [];
 	
 	/* Stores a count of definitions, so that we can sort identical selectors by definition order */
 	var rulecount = 0;
@@ -18,6 +18,7 @@ var prxy_counts = [0,0,0];
 			for (var k in store) delete store[k];
 			// And blow away _all_ livequery rules (not just ours)
 			$.livequery.queries = []; $.livequery.queue = []; 
+			onmatches = []; onunmatches = {};
 		}
 	}
 
@@ -32,13 +33,13 @@ var prxy_counts = [0,0,0];
 		generate: function(options){
 			options = options || {};
 			var getter, setter;
-			if (options.hasOwnProperty('initial')) {
+			if (options.initial) {
+				var initial = options.initial;
 				getter = function(){ 
 					var d = this.d(); var k = arguments.callee.pname;
-					if (!d.hasOwnProperty(k)) d[k] = arguments.callee.initial;
+					if (!d.hasOwnProperty(k)) d[k] = initial;
 					return d[k];
 				};
-				getter.initial = options.initial;
 			}
 			else getter = function(){ return this.d()[arguments.callee.pname] }
 			
@@ -83,6 +84,12 @@ var prxy_counts = [0,0,0];
 			var nr = new Rule(this);
 			nr.func = func;
 			return nr;
+		},
+		bind_cd: function(create, destroy) {
+			var nr = new Rule(this);
+			nr.create = create;
+			nr.destroy = destroy;
+			return nr;
 		}
 	})
 	
@@ -105,14 +112,12 @@ var prxy_counts = [0,0,0];
 					if (!funcs) return;
 					
 					if (ctx.length == 1) {
-						prxy_counts[1]++;
 						for (var j = funcs.length-1; j >= 0 && ctx.length; j--) {
 							if (ctx.fastis(funcs[j].selector)) return rv = funcs[j].func.apply(ctx, args);
 						}
 						return rv;
 					}
 					
-					prxy_counts[2]++;
 					for (var j = funcs.length-1; j >= 0 && ctx.length; j--) {
 						var match = ctx.filter(funcs[j].selector);
 						if (match.length){
@@ -163,7 +168,12 @@ var prxy_counts = [0,0,0];
 		},
 		
 		add: function(ctx, rule, data) {
+			if (data['onmatch'] || data['onunmatch'])
+			onmatches.push(rule.bind_cd(data['onmatch'], data['onunmatch']));
+			
 			for (var k in data) {
+				if (k == 'onmatch' || k == 'onunmatch') continue;
+				
 				var v = data[k];
 				
 				if (v == $.property || v instanceof $.property) {
@@ -175,13 +185,7 @@ var prxy_counts = [0,0,0];
 				else if ($.isFunction(v)) {
 					var proxy = this.bind_proxy(ctx, (k.match(/^[a-z]/) ? this.prepend+k : k), rule.bind(v));
 			
-					if (k == 'onmatch') {
-						ctx.livequery(proxy);
-					}
-					else if (k == 'onunmatch') {
-						ctx.livequery(function(){}, proxy);
-					}
-					else if (match = k.match(/^on(.*)/)) {
+					if (match = k.match(/^on(.*)/)) {
 						ctx.livequery(match[1], proxy);
 					}
 				}
@@ -221,5 +225,67 @@ var prxy_counts = [0,0,0];
 	$.fn.hasConcrete = function(name) {
 		return base.has(this, name);
 	};
-		
+
+
+	var check_id = null;
+	var match_cache = {};
+
+	function processqueue() {
+		var matched = $([]);
+		for (var j = onmatches.length-1; j >= 0; j--) {
+			var sel = onmatches[j].selector;
+			var res = $(sel).not(matched);
+			if (res.length) {
+				matched.add(res);
+				
+				
+				if (match_cache[sel]) {
+					nw = res.not(match_cache[sel]);
+					old = match_cache[sel].not(res);
+					if (onmatches[j].destroy) old.each(function(){onmatches[j].destroy.call($(this))});
+				}
+				else nw = res;
+				
+				if (onmatches[j].create) nw.each(function(){
+					onmatches[j].create.call($(this));
+				})
+				match_cache[sel] = res;
+			}
+		}
+				
+		check_id = null;
+	}
+	
+	mutinf = {};
+	
+	function registerMutateFunction() {
+		$.each(arguments, function(i,func){
+			var old = $.fn[func];
+			$.fn[func] = function() {
+				mutinf[func] = ( mutinf[func] ? mutinf[func] + 1 : 1 ); 
+				var rv = old.apply(this, arguments);
+				if (!check_id) check_id = setTimeout(processqueue, 100);
+				return rv;
+			}
+		})
+	}
+	
+	function registerSetterGetterFunction() {
+		$.each(arguments, function(i,func){
+			var old = $.fn[func];
+			$.fn[func] = function() {
+				var rv = old.apply(this, arguments);
+				if (arguments.length > 1 || typeof arguments[0] != 'string') {
+					mutinf[func] = ( mutinf[func] ? mutinf[func] + 1 : 1 ); 
+					if (!check_id) check_id = setTimeout(processqueue, 100);
+				}
+				return rv;
+			}
+		})
+	}
+
+	// Register core DOM manipulation methods
+	registerMutateFunction('append', 'prepend', 'after', 'before', 'wrap', 'removeAttr', 'addClass', 'removeClass', 'toggleClass', 'empty', 'remove');
+	registerSetterGetterFunction('attr');
+	
 })(jQuery);
