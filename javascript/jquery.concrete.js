@@ -233,24 +233,21 @@
 	function processqueue() {
 		var matched = $([]);
 		for (var j = onmatches.length-1; j >= 0; j--) {
-			var sel = onmatches[j].selector;
+			var sel = onmatches[j].selector, create = onmatches[j].create, destroy = onmatches[j].destroy;
 			var res = $(sel).not(matched);
 			if (res.length) {
 				matched.add(res);
 				
-				
 				if (match_cache[sel]) {
 					nw = res.not(match_cache[sel]);
 					old = match_cache[sel].not(res);
-					if (onmatches[j].destroy) old.each(function(){onmatches[j].destroy.call($(this))});
+					if (old.length && destroy) { for (var i = old.length; i;) destroy.call($(old[--i])); }
 				}
 				else nw = res;
 				
-				if (onmatches[j].create) nw.each(function(){
-					onmatches[j].create.call($(this));
-				})
-				match_cache[sel] = res;
+				if (nw.length && create) { for (var i = nw.length; i;) create.call($(nw[--i])); }
 			}
+			match_cache[sel] = res;
 		}
 				
 		check_id = null;
@@ -273,9 +270,9 @@
 	function registerSetterGetterFunction() {
 		$.each(arguments, function(i,func){
 			var old = $.fn[func];
-			$.fn[func] = function() {
+			$.fn[func] = function(a, b) {
 				var rv = old.apply(this, arguments);
-				if (arguments.length > 1 || typeof arguments[0] != 'string') {
+				if (b !== undefined || typeof a != 'string') {
 					mutinf[func] = ( mutinf[func] ? mutinf[func] + 1 : 1 ); 
 					if (!check_id) check_id = setTimeout(processqueue, 100);
 				}
