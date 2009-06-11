@@ -186,7 +186,7 @@
 					var proxy = this.bind_proxy(ctx, (k.match(/^[a-z]/) ? this.prepend+k : k), rule.bind(v));
 			
 					if (match = k.match(/^on(.*)/)) {
-						ctx.livequery(match[1], proxy);
+						ctx.live(match[1], proxy);
 					}
 				}
 				else {
