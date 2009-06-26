@@ -31,7 +31,9 @@ class PromoSection extends DataObject {
 		$info = $this->Template()->Info();
 		$info['id'] = $this->ID;
 		$info['spots'] = array();
-		foreach ($this->UnexpiredSpots() as $spot) {
+		
+		$spots = $this->UnexpiredSpots();
+		if ($spots) foreach ($spots as $spot) {
 			$info['spots'][$spot->Spot][] = $spot->Info();
 		}
 		return $info;
@@ -59,7 +61,7 @@ class PromoSection extends DataObject {
 		
 		$seen = array();
 		$grouped = new DataObjectSet();
-		foreach ($spots as $spot) {
+		if ($spots) foreach ($spots as $spot) {
 			if (!isset($seen[$spot->Spot])) { $seen[$spot->Spot] = true; $grouped->push($spot); }
 		}
 		
