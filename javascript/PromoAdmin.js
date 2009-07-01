@@ -460,7 +460,7 @@ var fixRightWidth = function() {
 				$(this).find('.promosection').prepend('<img class="remove" src="promospots/images/cross-circle.png" />');
 				$(this).find('.remove').bind('click', function(){ 
 					var list = $(this).parents('#PromoPageSections');
-					$(this).parent().remove(); 
+					$(this).parent().parent().remove(); 
 					list.$resize();
 				});
 			}
