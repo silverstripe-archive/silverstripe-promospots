@@ -5,9 +5,10 @@ class PromoSection extends DataObject {
 	static $default_sort = '`Order`';
 	
 	static $db = array(
+		'Space' => 'Varchar(50)',
 		'Name' => 'Varchar(100)',
 		'TemplateClass' => 'Varchar(100)',
-		'Order' => 'Int'
+		'Order' => 'Int',
 	);
 	
 	static $has_one = array(
@@ -17,7 +18,7 @@ class PromoSection extends DataObject {
 	static $has_many = array(
 		'PromoSpots' => 'PromoSpot'
 	);
-
+	
 	function spot($i) {
 		$spots = $this->PromoSpots()->toArray();
 		return $spots[$i];

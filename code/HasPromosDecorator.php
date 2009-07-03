@@ -2,12 +2,33 @@
 
 class HasPromosDecorator extends DataObjectDecorator {
 	
+	function __construct() {
+		$this->spaces = func_get_args(); 
+		if (!$this->spaces) $this->spaces = array('PromoSections');
+		parent::__construct();
+	}
+	
 	function extraStatics() {
 		return array(
 			'has_many' => array(
-				'PromoSections' => 'PromoSection'
+				'AllSections' => 'PromoSection'
 			)
 		);
+	}
+	
+	function setOwner(Object $owner, $ownerBaseClass = null) {
+		parent::setOwner($owner, $ownerBaseClass);
+		foreach ($this->spaces as $space) {
+			$this->owner->addWrapperMethod($space, 'getPromoSpace');
+		}
+	}
+
+	function getPromoSpaces() {
+		return $this->spaces;
+	}
+	
+	function getPromoSpace($space) {
+		return $this->owner->getComponents('AllSections', "`PromoSection`.`Space` = '$space'");
 	}
 	
 	static function getPromoClasses() {

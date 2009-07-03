@@ -34,12 +34,23 @@ class PromoAdmin extends LeftAndMainJQuery13 {
 	}
 	
 	public function PageSelectorField() {
-		$optionsetField = new DropdownField('PageID', 'PageID', HasPromosDecorator::getPromoPages()->toDropDownMap());
+		$map = array();
+		$pages = HasPromosDecorator::getPromoPages();
+		
+		foreach ($pages as $page) {
+			$spaces = $page->getPromoSpaces();
+			if (count($spaces) == 1) $map["{$page->ID}:{$spaces[0]}"] = "{$page->Title}";
+			else foreach ($spaces as $space) {
+				$map["{$page->ID}:{$space}"] = "{$page->Title} - {$space}";
+			}
+		}
+		
+		$optionsetField = new DropdownField('PageID', 'PageID', $map);
 		return $optionsetField->Field();
 	}	
 	
 	public function Page($req) {
-		$id = $req->param('ID');
+		list($id, $space) = explode(':', $req->param('ID'));
 		$id = is_numeric($id) ? (int)$id : 0;
 		
 		if ($req->isPOST()) {
@@ -56,6 +67,7 @@ class PromoAdmin extends LeftAndMainJQuery13 {
 				else {
 					$section = singleton($sectionData->templateClass)->NewInstance();	
 					$section->PageID = $id;
+					$section->Space = $space;
 				}
 				
 				$section->Order = $sectionData->order;
@@ -80,7 +92,7 @@ class PromoAdmin extends LeftAndMainJQuery13 {
 				}
 			}
 			
-			foreach ($page->PromoSections() as $section) {
+			foreach ($page->getPromoSpace($space) as $section) {
 				if (!in_array($section->ID, $foundSections)) {
 					$section->PromoSpots()->removeAll();
 					$section->delete();
@@ -90,7 +102,7 @@ class PromoAdmin extends LeftAndMainJQuery13 {
 		else {
 			$page = DataObject::get_by_id('Page', $id);
 			$sections = array();
-			foreach ($page->PromoSections() as $section) $sections[] = $section->Info();
+			foreach ($page->getPromoSpace($space) as $section) $sections[] = $section->Info();
 			$res = array(
 				'PromoSections' => $sections
 			);
@@ -111,8 +123,9 @@ class PromoAdmin extends LeftAndMainJQuery13 {
 	}
 	
 	public function AvailableItems($req) {
-		$pageID = (int)$req->param('ID');
+		list($id, $space) = explode(':', $req->param('ID'));
+		$id = is_numeric($id) ? (int)$id : 0;
 		$template = $req->param('OtherID');
-		return singleton($template)->ItemProvider()->AvailableItems(DataObject::get_by_id('Page', $pageID));
+		return singleton($template)->ItemProvider()->AvailableItems(DataObject::get_by_id('Page', $id));
 	}
 }
