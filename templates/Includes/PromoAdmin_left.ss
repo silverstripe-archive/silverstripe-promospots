@@ -9,8 +9,7 @@
 	</h2>
 	<div id="sitetree_holder">
 		<div style="clear:both;"></div>
-		<div id="AvailableItemFilter">
-		</div>
+		<div id="AvailableItemsFilter"></div>
 		<div id="AvailableItems">
 			<p>Please select a promo spot to see available items</p>
 		</div>

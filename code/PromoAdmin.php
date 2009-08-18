@@ -1,6 +1,6 @@
 <?php 
 
-class PromoAdmin extends LeftAndMainJQuery13 {
+class PromoAdmin extends LeftAndMain {
 
 	static $url_segment = 'promos';
 	static $menu_title = 'Promos';
@@ -14,23 +14,21 @@ class PromoAdmin extends LeftAndMainJQuery13 {
 		foreach ($ui as $css) Requirements::css("promospots/css/cupertino/ui.$css.css");		
 		
 		/* Require the UI code I need */
-		$ui = array('ui.core', 'ui.tabs', 'ui.draggable', 'ui.droppable', 'ui.sortable', 'ui.resizable', 'ui.datepicker', 'effects.core', 'effects.scale');
-		foreach ($ui as $lib) JQuery13::requireUI($lib);
+		JQuery13::requireUI('ui.core', 'ui.tabs', 'ui.draggable', 'ui.droppable', 'ui.sortable', 'ui.resizable', 'ui.datepicker', 'effects.core', 'effects.scale');
 		
 		/* And a single extra library */
 		Requirements::javascript('promospots/javascript/jquery.json.js');
 		
 		/* My (Hamish Friedlander's) code. This should be pulled into a different module or something once I'm done with it */
 		Requirements::javascript('promospots/javascript/jquery.stringinterp.js');
-		Requirements::javascript('promospots/javascript/jquery.dat.js');
-		Requirements::javascript('promospots/javascript/jquery.specifity.js');
-		Requirements::javascript('promospots/javascript/jquery.fastis.js');
-		Requirements::javascript('promospots/javascript/jquery.concrete.js');
+		Requirements::javascript('promospots/javascript/concrete.js');
 		
 		Requirements::css('promospots/css/PromoAdmin.css');
 		Requirements::javascript('promospots/javascript/PromoAdmin.js');
 		
 		Requirements::customScript($this->PromoSections());
+		
+		Requirements::block(THIRDPARTY_DIR . '/jquery/plugins/livequery/jquery.livequery.js');
 	}
 	
 	public function PageSelectorField() {
@@ -119,13 +117,32 @@ class PromoAdmin extends LeftAndMainJQuery13 {
 			$sections[] = singleton($class)->Info();
 		}
 		
-		return 'jQuery(function($){$("#PromoAvailableSections").$display('.Convert::raw2json(array( 'sections' => $sections )).');})';
+		return 'jQuery(function($){$("#PromoAvailableSections").concrete("ss.promospots").display('.Convert::raw2json(array( 'sections' => $sections )).');})';
+	}
+	
+	public function AvailableItemsFilterFields($req) {
+		list($id, $space) = explode(':', $req->param('ID'));
+		
+		$id = is_numeric($id) ? (int)$id : 0;
+		$template = $req->param('OtherID');
+		
+		$fields = singleton($template)->ItemProvider()->AvailableItemsFilterFields();
+		
+		$html = '';
+		foreach ($fields as $field) $html .= $field->FieldHolder();
+		return $html;
 	}
 	
 	public function AvailableItems($req) {
 		list($id, $space) = explode(':', $req->param('ID'));
 		$id = is_numeric($id) ? (int)$id : 0;
-		$template = $req->param('OtherID');
-		return singleton($template)->ItemProvider()->AvailableItems(DataObject::get_by_id('Page', $id));
+		
+		$template = singleton($req->param('OtherID'));
+		$itemProvider = $template->ItemProvider();
+		
+		$items = $itemProvider->AvailableItems(DataObject::get_by_id('Page', $id), $req->requestVars());
+		$list = array();
+		foreach ($items as $item) { $label = $itemProvider->LabelForID($item->ID); $list[] = "<li alt='Page:{$item->ID}'>{$label}</li>"; }
+		return '<ul class="PromoAvailableArticles">'. implode("\n", $list) . '</ul>'; 
 	}
 }
