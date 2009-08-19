@@ -66,6 +66,10 @@ class PromoSection extends DataObject {
 			if (!isset($seen[$spot->Spot])) { $seen[$spot->Spot] = true; $grouped->push($spot); }
 		}
 		
+		foreach ($this->Template()->stat('spots') as $spot) { 
+			if (!isset($seen[$spot])) $grouped->push(new ArrayData(array('Item' => $this->Template()->FillSpot($this, $spot))));
+		}
+		
 		return $grouped;
 	}
 	

@@ -1,9 +1,9 @@
 <?php 
 
 interface PromoItemsProvider {
-	function ItemForID($id);
-	function LabelForID($id);
+	function Item($idOrRecord);
+	function Label($idOrItem);
 
-	function AvailableItems($Page, $SearchTerms) ;
-	function AvailableItemsFilterFields() ;
+	function Query($Page, $searchTerms = null);
+	function SearchContext();
 }

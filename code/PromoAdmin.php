@@ -126,7 +126,7 @@ class PromoAdmin extends LeftAndMain {
 		$id = is_numeric($id) ? (int)$id : 0;
 		$template = $req->param('OtherID');
 		
-		$fields = singleton($template)->ItemProvider()->AvailableItemsFilterFields();
+		$fields = singleton($template)->ItemProvider()->SearchContext()->getFields();
 		
 		$html = '';
 		foreach ($fields as $field) $html .= $field->FieldHolder();
@@ -139,10 +139,12 @@ class PromoAdmin extends LeftAndMain {
 		
 		$template = singleton($req->param('OtherID'));
 		$itemProvider = $template->ItemProvider();
+
+		$query = $itemProvider->Query(DataObject::get_by_id('Page', $id), $req->requestVars());
+		$query->limit(100);
 		
-		$items = $itemProvider->AvailableItems(DataObject::get_by_id('Page', $id), $req->requestVars());
 		$list = array();
-		foreach ($items as $item) { $label = $itemProvider->LabelForID($item->ID); $list[] = "<li alt='Page:{$item->ID}'>{$label}</li>"; }
+		foreach ($query->execute() as $record) { $label = $itemProvider->Label($record); $list[] = "<li alt='Page:{$record['ID']}'>{$label}</li>"; }
 		return '<ul class="PromoAvailableArticles">'. implode("\n", $list) . '</ul>'; 
 	}
 }

@@ -24,6 +24,13 @@ abstract class PromoSectionTemplate extends ViewableData {
 	/** @var PromoItemsProvider - A class implementing PromoItemsProvider as a string */
 	static $items_provider = '';
 	
+	/** @var PromoFillStrategry - A class implementing PromoFillStrategy as a string */
+	static $fill_strategy = 'PromoRandomFillStrategy';
+	
+	function Spots() {
+		return $this->stat('spots');
+	}
+	
 	function NewInstance() {
 		return new PromoSection(array(
 			'Name' => $this->stat('name'),
@@ -69,4 +76,8 @@ abstract class PromoSectionTemplate extends ViewableData {
 		);
 	}
 	
+	function FillSpot($section, $spot) {
+		$rv = singleton($this->stat('fill_strategy'))->Fill($this, $section, $spot);
+		return $rv;
+	}
 }

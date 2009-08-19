@@ -16,11 +16,11 @@ class PromoSpot extends DataObject {
 	);
 
 	function Item() {
-		return $this->PromoSection()->Template()->ItemProvider()->ItemForID($this->ItemID);
+		return $this->PromoSection()->Template()->ItemProvider()->Item($this->ItemID);
 	}
 	
 	function Info() {
-		$label = $this->PromoSection()->Template()->ItemProvider()->LabelForID($this->ItemID);
+		$label = $this->PromoSection()->Template()->ItemProvider()->Label($this->ItemID);
 		return array(
 			'start' => $this->Start,
 			'length' => $this->Length,
