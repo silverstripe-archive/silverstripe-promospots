@@ -60,14 +60,28 @@ class PromoSection extends DataObject {
 			'Start DESC'
 		);
 		
-		$seen = array();
-		$grouped = new DataObjectSet();
+		// Find manually picked spots (there might be more than one for a given timerange - pick the first for each spots
+		$picked = array();
 		if ($spots) foreach ($spots as $spot) {
-			if (!isset($seen[$spot->Spot])) { $seen[$spot->Spot] = true; $grouped->push($spot); }
+			if (!array_key_exists($spot->Spot, $picked)) $picked[$spot->Spot] = $spot;
 		}
 		
-		foreach ($this->Template()->stat('spots') as $spot) { 
-			if (!isset($seen[$spot])) $grouped->push(new ArrayData(array('Item' => $this->Template()->FillSpot($this, $spot))));
+		// Build a DataObjectSet of PromoSpots, one per Section Spot hole
+		$grouped = new DataObjectSet();
+		foreach ($this->Template()->stat('spots') as $spot) {
+
+			// If we have a manually picked spot for this hole, just use it 
+			if (array_key_exists($spot, $picked)) {
+				$grouped->push($picked[$spot]);	
+			}
+			
+			// Otherwise pick one automatically using the templates fill strategy 
+			else {
+				$grouped->push(new ArrayData(array(
+					'Spot' => $spot,
+					'Item' => $this->Template()->FillSpot($this, $spot)
+				)));	
+			}
 		}
 		
 		return $grouped;
