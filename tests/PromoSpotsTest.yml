@@ -1,0 +1,26 @@
+SiteTree:
+    page1:
+        Title: new page
+PromoSection:
+    section1:
+        Space: PromoSections
+        Name: Section 1
+        TemplateClass: PromoSectionSingleWithPhoto
+        Order: 1
+        PageID: =>SiteTree.page1
+PromoSpot:
+    spot1:
+        Spot: 1
+        Start: 14678
+        Length: 12
+        ItemClassName: Page
+        ItemID: 100
+        PromoSectionID: =>PromoSection.section1
+ArticlePage:
+    article100:
+        ID: 100
+        Title: article 100
+        Content: article 100 content
+
+        
+            

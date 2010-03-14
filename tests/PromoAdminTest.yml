@@ -1,0 +1,15 @@
+PromoAdminTest_Promo:
+    promo:
+        name:carloco
+
+Member:
+   admin:
+      FirstName: admin
+Group:
+   admin:
+      Title: Admin
+      Members: =>Member.admin
+Permission:
+   admin:
+      Code: ADMIN
+      Group: =>Group.admin

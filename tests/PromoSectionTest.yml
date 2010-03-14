@@ -1,0 +1,44 @@
+Page:
+    Home:
+        Title: Home Page
+        
+PromoSection:
+    section1:
+        Space: Carosel
+        Name: section 1
+        TemplateClass: PromoSectionSingleWithPhoto
+        Order: 1
+        PageID: =>Page.Home
+    section2:
+        Space: PromoSections
+        Name: section 2
+        TemplateClass: PromoSectionSingleWithPhoto
+        Order: 3
+        PageID: =>Page.Home
+
+PromoSpot:
+    spot1:
+        Spot: 1
+        Start: 14000
+        Length: 12
+        ItemClassName: Page
+        ItemID: =>Page.Home
+        PromoSectionID: =>PromoSection.section1
+    spot2:
+        Spot: 2
+        Start: 14000
+        Length: 12
+        ItemClassName: Page
+        ItemID: =>Page.Home
+        PromoSectionID: =>PromoSection.section1
+
+PromoDatePick:
+    datepick1:
+        Spot: =>PromoSpot.spot1
+        Day: 14600
+        ItemID: =>Page.Home
+        PromoSection: =>PromoSection.section1
+
+        
+
+    
